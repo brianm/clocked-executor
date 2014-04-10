@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.skife</groupId>
+    <artifactId>clocked-executor</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>clocked-executor</name>
+    <url>http://github.com/brianm/clocked-executor</url>
+
+    <parent>
+        <groupId>org.basepom</groupId>
+        <artifactId>basepom-standard-oss</artifactId>
+        <version>5</version>
+    </parent>
+
+    <properties>
+        <!-- needed for basepom to make surefire happy, this is annoying! -->
+        <argLine>-Xmx128M</argLine>
+        <project.build.targetJdk>1.8</project.build.targetJdk>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>1.6.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
