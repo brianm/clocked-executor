@@ -18,7 +18,7 @@
     <properties>
         <!-- needed for basepom to make surefire happy, this is annoying! -->
         <argLine>-Xmx128M</argLine>
-        <project.build.targetJdk>1.8</project.build.targetJdk>
+        <project.build.targetJdk>1.7</project.build.targetJdk>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

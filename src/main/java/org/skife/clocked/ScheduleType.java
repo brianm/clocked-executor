@@ -1,6 +1,6 @@
 package org.skife.clocked;
 
-public enum ScheduleType
+enum ScheduleType
 {
     once, rate, delay
 }
