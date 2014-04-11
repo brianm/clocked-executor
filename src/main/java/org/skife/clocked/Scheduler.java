@@ -10,59 +10,65 @@ import java.util.concurrent.TimeUnit;
 
 class Scheduler
 {
-    private final TreeSet<ScheduledFutureTask<?>> tasks = new TreeSet<>();
+    private volatile TreeSet<ScheduledFutureTask<?>> tasks = new TreeSet<>();
     private final Clock clock = new Clock();
 
-    public ScheduledFuture<?> addOnce(final Runnable command, final long delay, final TimeUnit unit)
+    public synchronized ScheduledFuture<?> addOnce(final Runnable command, final long delay, final TimeUnit unit)
     {
-        ScheduledFutureTask<?> task = new ScheduledFutureTask<>(command, null, clock, unit.toMillis(delay), ScheduleType.once);
+        ScheduledFutureTask<?> task = new ScheduledFutureTask<>(command, null, clock, unit.toMillis(delay));
         tasks.add(task);
         return task;
     }
 
-    public <V> ScheduledFuture<V> addOnce(final Callable<V> callable, final long delay, final TimeUnit unit)
+    public synchronized <V> ScheduledFuture<V> addOnce(final Callable<V> callable, final long delay, final TimeUnit unit)
     {
-        ScheduledFutureTask<V> task = new ScheduledFutureTask<>(callable, clock, unit.toMillis(delay), ScheduleType.once);
+        ScheduledFutureTask<V> task = new ScheduledFutureTask<>(callable, clock, unit.toMillis(delay));
         tasks.add(task);
         return task;
     }
 
-    public ScheduledFuture<?> addAtFixedRate(final Runnable command, final long delay, final long period, final TimeUnit unit)
+    public synchronized ScheduledFuture<?> addAtFixedRate(final Runnable command, final long initialDelay, final long period, final TimeUnit unit)
     {
-        ScheduledFutureTask<?> task = new ScheduledFutureTask<>(command, null, clock, unit.toMillis(delay), ScheduleType.rate);
+        I probbaly need to build this in the executor service and then pass Scheduled thing here, then
+        I can rescheudle same against the scheduler safely. Pushing the creation of ScheduledFutureTask down to
+        the scheduler is making rescheduling not possible.
+        ScheduledFutureTask<?> task = new FixedRateScheduledFutureTask<>(this,
+                                                                         command,
+                                                                         null,
+                                                                         clock,
+                                                                         unit.toMillis(initialDelay),
+                                                                         unit.toMillis(period));
         tasks.add(task);
         return task;
     }
 
-    public ScheduledFuture<?> addWithFixedDelay(final Runnable command, final long delay, final long delay1, final TimeUnit unit)
+    public synchronized ScheduledFuture<?> addWithFixedDelay(final Runnable command, final long delay, final long delay1, final TimeUnit unit)
     {
         throw new UnsupportedOperationException("Not Yet Implemented!");
     }
 
-    public List<ScheduledFutureTask<?>> advance(final long millis)
+    public synchronized List<ScheduledFutureTask<?>> advance(final long millis)
     {
         clock.advance(millis);
+        // advance() totally screws up the sort order, so let's clean it up with a new set :-)
+        TreeSet<ScheduledFutureTask<?>> new_tasks = new TreeSet<>();
+        new_tasks.addAll(this.tasks);
 
-        Iterator<ScheduledFutureTask<?>> itty = tasks.iterator();
-        List<ScheduledFutureTask<?>> tasks = new ArrayList<>();
+        Iterator<ScheduledFutureTask<?>> itty = new_tasks.iterator();
+        List<ScheduledFutureTask<?>> to_run = new ArrayList<>();
         while (itty.hasNext()) {
             ScheduledFutureTask<?> t = itty.next();
             if (t.isReady()) {
-                switch(t.getType()) {
-                    case once:
-                        tasks.add(t);
-                        break;
-                    case rate:
-                    case delay:
-                    default:
-                        throw new UnsupportedOperationException("Not Yet Implemented!");
-                }
+                to_run.add(t);
                 itty.remove();
             }
-            else {
-                return tasks;
+            else
+            {
+                return to_run;
             }
         }
-        return tasks;
+
+        this.tasks = new_tasks;
+        return to_run;
     }
 }

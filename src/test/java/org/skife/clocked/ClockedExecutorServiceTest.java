@@ -1,5 +1,6 @@
 package org.skife.clocked;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
@@ -9,6 +10,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ClockedExecutorServiceTest
 {
+    @Before
+    public void setUp() throws Exception
+    {
+        counter.set(0);
+    }
+
     @Test
     public void testOneOff() throws Exception
     {
@@ -44,6 +51,7 @@ public class ClockedExecutorServiceTest
     }
 
     public static final AtomicLong counter = new AtomicLong(0);
+
     public static final Runnable NOOP = new Runnable()
     {
         @Override

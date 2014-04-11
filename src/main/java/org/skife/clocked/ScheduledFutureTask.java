@@ -10,22 +10,19 @@ class ScheduledFutureTask<V> extends FutureTask<V> implements ScheduledFuture<V>
 {
     private final Clock clock;
     private final long when;
-    private final ScheduleType type;
 
-    ScheduledFutureTask(final Callable<V> callable, Clock clock, long when, ScheduleType type)
+    ScheduledFutureTask(final Callable<V> callable, Clock clock, long delay)
     {
         super(callable);
         this.clock = clock;
-        this.when = when;
-        this.type = type;
+        this.when = delay;
     }
 
-    ScheduledFutureTask(final Runnable runnable, final V result, Clock clock, long when, ScheduleType type)
+    ScheduledFutureTask(final Runnable runnable, final V result, Clock clock, long delay)
     {
         super(runnable, result);
         this.clock = clock;
-        this.when = when;
-        this.type = type;
+        this.when = delay;
     }
 
     @Override
@@ -53,15 +50,5 @@ class ScheduledFutureTask<V> extends FutureTask<V> implements ScheduledFuture<V>
     public boolean isReady()
     {
         return clock.getMillis() >= when;
-    }
-
-    public boolean isRescheduled() {
-        return type != ScheduleType.once;
-    }
-
-
-    public ScheduleType getType()
-    {
-        return type;
     }
 }
