@@ -9,9 +9,9 @@ class Clock
         return time;
     }
 
-    synchronized long advanceMillis(long time)
+    synchronized long advanceMillis(long advance)
     {
-        time += time;
-        return time;
+        this.time += advance;
+        return this.time;
     }
 }
