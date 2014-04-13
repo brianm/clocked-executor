@@ -1,4 +1,4 @@
-# Testing-Oriented implementation of ScheduledExecutorService
+# Test-Oriented ScheduledExecutorService
 
 ScheduledExecutorService implementation designed for deterministic testing. It runs off an
 internal clock which must be manually advanced via the <code>ClockedExecutorService#advance</code>
