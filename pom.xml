@@ -12,13 +12,11 @@
 ~   See the License for the specific language governing permissions and
 ~   limitations under the License.
 -->
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.skife</groupId>
     <artifactId>clocked-executor</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>clocked-executor</name>
     <url>http://github.com/brianm/clocked-executor</url>
     <description>
@@ -37,7 +35,7 @@
         <connection>scm:git:git://github.com/brianm/clocked-executor.git</connection>
         <developerConnection>scm:git:git@github.com:brianm/clocked-executor.git</developerConnection>
         <url>https://github.com/brianm/clocked-executor/</url>
-        <tag>HEAD</tag>
+        <tag>clocked-executor-0.0.1</tag>
     </scm>
     <developers>
         <developer>
