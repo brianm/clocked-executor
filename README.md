@@ -8,4 +8,5 @@ Additionally, for recurring scheduled tasks, there is a guarantee that the task 
 be called once for each call to <code>advance(...)</code>. This is important to note as it
 rather violates the normal contracts, but is very useful for testing.
 
-
+* [Example](/brianm/clocked-executor/blob/master/src/test/java/org/skife/clocked/ClockedExecutorServiceTest.java)
+* [Maven](http://search.maven.org/#search%7Cga%7C1%7Cclocked-executor)
