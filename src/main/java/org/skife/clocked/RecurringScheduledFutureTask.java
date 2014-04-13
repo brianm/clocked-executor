@@ -1,12 +1,12 @@
 package org.skife.clocked;
 
-class FixedRateScheduledFutureTask<V> extends ScheduledFutureTask<V>
+class RecurringScheduledFutureTask<V> extends ScheduledFutureTask<V>
 {
     private final Scheduler scheduler;
     private final Runnable command;
     private final long period;
 
-    public FixedRateScheduledFutureTask(Scheduler scheduler,
+    public RecurringScheduledFutureTask(Scheduler scheduler,
                                         final Runnable command,
                                         final Clock clock,
                                         final long when,
@@ -21,7 +21,7 @@ class FixedRateScheduledFutureTask<V> extends ScheduledFutureTask<V>
     @Override
     public void run()
     {
-        scheduler.add(new FixedRateScheduledFutureTask<>(scheduler,
+        scheduler.add(new RecurringScheduledFutureTask<>(scheduler,
                                                          command,
                                                          getClock(),
                                                          getWhen() + period,

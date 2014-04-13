@@ -28,7 +28,7 @@ class ScheduledFutureTask<V> extends FutureTask<V> implements ScheduledFuture<V>
     @Override
     public long getDelay(final TimeUnit unit)
     {
-        return unit.convert(when - clock.getMillis(), TimeUnit.MILLISECONDS);
+        return unit.convert(when - clock.getTimeInMillis(), TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -49,7 +49,7 @@ class ScheduledFutureTask<V> extends FutureTask<V> implements ScheduledFuture<V>
 
     boolean isReady()
     {
-        return clock.getMillis() >= getWhen();
+        return clock.getTimeInMillis() >= getWhen();
     }
 
     protected Clock getClock()

@@ -24,7 +24,7 @@ class Scheduler
 
     public List<ScheduledFutureTask<?>> advance(final long millis)
     {
-        clock.advance(millis);
+        clock.advanceMillis(millis);
 
         TreeSet<ScheduledFutureTask<?>> new_tasks = new TreeSet<>();
         new_tasks.addAll(this.tasks);

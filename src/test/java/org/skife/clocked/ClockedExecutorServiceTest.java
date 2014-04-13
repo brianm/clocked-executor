@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ClockedExecutorServiceTest
 {
-
     @Before
     public void setUp() throws Exception
     {
@@ -20,23 +19,23 @@ public class ClockedExecutorServiceTest
     @Test
     public void testOneOff() throws Exception
     {
-        try (ClockedExecutorService clock = new ClockedExecutorService(2))
+        try (ClockedExecutorService executor = new ClockedExecutorService())
         {
-            clock.schedule(COUNTER, 10, TimeUnit.MILLISECONDS);
-            clock.schedule(COUNTER, 5, TimeUnit.MILLISECONDS);
-            clock.schedule(COUNTER, 15, TimeUnit.MILLISECONDS);
-            clock.schedule(COUNTER, 20, TimeUnit.MILLISECONDS);
+            executor.schedule(COUNTER, 10, TimeUnit.MILLISECONDS);
+            executor.schedule(COUNTER, 5, TimeUnit.MILLISECONDS);
+            executor.schedule(COUNTER, 15, TimeUnit.MILLISECONDS);
+            executor.schedule(COUNTER, 20, TimeUnit.MILLISECONDS);
 
-            clock.advance(5, TimeUnit.MILLISECONDS).get();
+            executor.advance(5, TimeUnit.MILLISECONDS).get();
             assertThat(count.get()).isEqualTo(1);
 
-            clock.advance(5, TimeUnit.MILLISECONDS).get();
+            executor.advance(5, TimeUnit.MILLISECONDS).get();
             assertThat(count.get()).isEqualTo(2);
 
-            clock.advance(2, TimeUnit.MILLISECONDS).get();
+            executor.advance(2, TimeUnit.MILLISECONDS).get();
             assertThat(count.get()).isEqualTo(2);
 
-            clock.advance(10, TimeUnit.MILLISECONDS).get();
+            executor.advance(10, TimeUnit.MILLISECONDS).get();
             assertThat(count.get()).isEqualTo(4);
         }
     }
@@ -44,7 +43,7 @@ public class ClockedExecutorServiceTest
     @Test
     public void testAtFixedInterval() throws Exception
     {
-        try (ClockedExecutorService clock = new ClockedExecutorService(2))
+        try (ClockedExecutorService clock = new ClockedExecutorService())
         {
             clock.scheduleAtFixedRate(COUNTER, 2, 10, TimeUnit.MILLISECONDS);
             clock.advance(2, TimeUnit.MILLISECONDS).get();

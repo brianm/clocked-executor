@@ -10,14 +10,34 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * <p>NOT INTENDED FOR USE OUTSIDE CAREFULLY CONTROLLED TESTS</p>
+ * <p>
+ * ScheduledExecutorService implementation designed for deterministic testing. It runs off an
+ * internal clock which must be manually advanced via the {@see ClockedExecutorService#advance}
+ * method.
+ * </p>
+ * <p>
+ * Additionally, for recurring scheduled tasks, there is a guarantee that the task will nly
+ * be called once for each call to <code>advance(...)</code>. This is important to note as it
+ * rather violates the normal contracts, but is very useful for testing.
+ * </p>
+ */
 public class ClockedExecutorService extends ThreadPoolExecutor implements ScheduledExecutorService, AutoCloseable
 {
-    private final Clock clock = new Clock();
-    private final Scheduler scheduler = new Scheduler(clock);
+    private final Clock clock;
+    private final Scheduler scheduler;
 
     public ClockedExecutorService(final int corePoolSize)
     {
         super(corePoolSize, corePoolSize, 365L, TimeUnit.DAYS, new LinkedBlockingQueue<Runnable>());
+        this.clock = new Clock();
+        this.scheduler = new Scheduler(clock);
+    }
+
+    public ClockedExecutorService()
+    {
+        this(1);
     }
 
     public Future<?> advance(long time, TimeUnit unit) throws ExecutionException, InterruptedException
@@ -35,7 +55,9 @@ public class ClockedExecutorService extends ThreadPoolExecutor implements Schedu
     public ScheduledFuture<?> schedule(final Runnable command, final long delay, final TimeUnit unit)
     {
         synchronized (scheduler) {
-            return scheduler.add(new ScheduledFutureTask<>(command, clock, clock.getMillis() + unit.toMillis(delay)));
+            return scheduler.add(new ScheduledFutureTask<>(command,
+                                                           clock,
+                                                           clock.getTimeInMillis() + unit.toMillis(delay)));
         }
     }
 
@@ -43,26 +65,38 @@ public class ClockedExecutorService extends ThreadPoolExecutor implements Schedu
     public <V> ScheduledFuture<V> schedule(final Callable<V> callable, final long delay, final TimeUnit unit)
     {
         synchronized (scheduler) {
-            return scheduler.add(new ScheduledFutureTask<>(callable, clock, clock.getMillis() + unit.toMillis(delay)));
+            return scheduler.add(new ScheduledFutureTask<>(callable,
+                                                           clock,
+                                                           clock.getTimeInMillis() + unit.toMillis(delay)));
         }
     }
 
     @Override
     public ScheduledFuture<?> scheduleAtFixedRate(final Runnable command, final long initialDelay, final long period, final TimeUnit unit)
     {
-        synchronized (scheduler) {
-            return scheduler.add(new FixedRateScheduledFutureTask(scheduler,
+        return scheduleRecurring(new RecurringScheduledFutureTask(scheduler,
                                                                   command,
                                                                   clock,
-                                                                  clock.getMillis() + unit.toMillis(initialDelay),
+                                                                  clock.getTimeInMillis() + unit.toMillis(initialDelay),
                                                                   unit.toMillis(period)));
-        }
+
     }
 
     @Override
     public ScheduledFuture<?> scheduleWithFixedDelay(final Runnable command, final long initialDelay, final long delay, final TimeUnit unit)
     {
-        throw new UnsupportedOperationException("Not Yet Implemented!");
+        return scheduleRecurring(new RecurringScheduledFutureTask(scheduler,
+                                                                  command,
+                                                                  clock,
+                                                                  clock.getTimeInMillis() + unit.toMillis(initialDelay),
+                                                                  unit.toMillis(delay)));
+    }
+
+    private ScheduledFuture<?> scheduleRecurring(final RecurringScheduledFutureTask task)
+    {
+        synchronized (scheduler) {
+            return scheduler.add(task);
+        }
     }
 
     @Override

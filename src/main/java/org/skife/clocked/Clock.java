@@ -4,15 +4,14 @@ class Clock
 {
     private volatile long time = 0;
 
-    long getMillis()
+    synchronized long getTimeInMillis()
     {
         return time;
     }
 
-    long advance(long millis)
+    synchronized long advanceMillis(long time)
     {
-        time += millis;
+        time += time;
         return time;
     }
-
 }
