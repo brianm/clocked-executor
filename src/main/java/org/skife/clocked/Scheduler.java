@@ -4,65 +4,46 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 class Scheduler
 {
-    private final TreeSet<ScheduledFutureTask<?>> tasks = new TreeSet<>();
-    private final Clock clock = new Clock();
+    private volatile TreeSet<ScheduledFutureTask<?>> tasks = new TreeSet<>();
+    private final Clock clock;
 
-    public ScheduledFuture<?> addOnce(final Runnable command, final long delay, final TimeUnit unit)
+    public Scheduler(final Clock clock)
     {
-        ScheduledFutureTask<?> task = new ScheduledFutureTask<>(command, null, clock, unit.toMillis(delay), ScheduleType.once);
-        tasks.add(task);
-        return task;
+        this.clock = clock;
     }
 
-    public <V> ScheduledFuture<V> addOnce(final Callable<V> callable, final long delay, final TimeUnit unit)
+    public <V> ScheduledFuture<V> add(final ScheduledFutureTask<V> task)
     {
-        ScheduledFutureTask<V> task = new ScheduledFutureTask<>(callable, clock, unit.toMillis(delay), ScheduleType.once);
         tasks.add(task);
         return task;
-    }
-
-    public ScheduledFuture<?> addAtFixedRate(final Runnable command, final long delay, final long period, final TimeUnit unit)
-    {
-        ScheduledFutureTask<?> task = new ScheduledFutureTask<>(command, null, clock, unit.toMillis(delay), ScheduleType.rate);
-        tasks.add(task);
-        return task;
-    }
-
-    public ScheduledFuture<?> addWithFixedDelay(final Runnable command, final long delay, final long delay1, final TimeUnit unit)
-    {
-        throw new UnsupportedOperationException("Not Yet Implemented!");
     }
 
     public List<ScheduledFutureTask<?>> advance(final long millis)
     {
         clock.advance(millis);
 
-        Iterator<ScheduledFutureTask<?>> itty = tasks.iterator();
-        List<ScheduledFutureTask<?>> tasks = new ArrayList<>();
+        TreeSet<ScheduledFutureTask<?>> new_tasks = new TreeSet<>();
+        new_tasks.addAll(this.tasks);
+
+        List<ScheduledFutureTask<?>> to_run = new ArrayList<>();
+        Iterator<ScheduledFutureTask<?>> itty = new_tasks.iterator();
         while (itty.hasNext()) {
             ScheduledFutureTask<?> t = itty.next();
             if (t.isReady()) {
-                switch(t.getType()) {
-                    case once:
-                        tasks.add(t);
-                        break;
-                    case rate:
-                    case delay:
-                    default:
-                        throw new UnsupportedOperationException("Not Yet Implemented!");
-                }
+                to_run.add(t);
                 itty.remove();
             }
-            else {
-                return tasks;
+            else
+            {
+                break;
             }
         }
-        return tasks;
+
+        this.tasks = new_tasks;
+        return to_run;
     }
 }

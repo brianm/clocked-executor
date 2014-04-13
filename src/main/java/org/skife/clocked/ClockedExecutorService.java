@@ -1,11 +1,9 @@
 package org.skife.clocked;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -14,7 +12,8 @@ import java.util.concurrent.TimeUnit;
 
 public class ClockedExecutorService extends ThreadPoolExecutor implements ScheduledExecutorService, AutoCloseable
 {
-    private final Scheduler scheduler = new Scheduler();
+    private final Clock clock = new Clock();
+    private final Scheduler scheduler = new Scheduler(clock);
 
     public ClockedExecutorService(final int corePoolSize)
     {
@@ -36,7 +35,7 @@ public class ClockedExecutorService extends ThreadPoolExecutor implements Schedu
     public ScheduledFuture<?> schedule(final Runnable command, final long delay, final TimeUnit unit)
     {
         synchronized (scheduler) {
-            return scheduler.addOnce(command, delay, unit);
+            return scheduler.add(new ScheduledFutureTask<>(command, clock, clock.getMillis() + unit.toMillis(delay)));
         }
     }
 
@@ -44,7 +43,7 @@ public class ClockedExecutorService extends ThreadPoolExecutor implements Schedu
     public <V> ScheduledFuture<V> schedule(final Callable<V> callable, final long delay, final TimeUnit unit)
     {
         synchronized (scheduler) {
-            return scheduler.addOnce(callable, delay, unit);
+            return scheduler.add(new ScheduledFutureTask<>(callable, clock, clock.getMillis() + unit.toMillis(delay)));
         }
     }
 
@@ -52,16 +51,18 @@ public class ClockedExecutorService extends ThreadPoolExecutor implements Schedu
     public ScheduledFuture<?> scheduleAtFixedRate(final Runnable command, final long initialDelay, final long period, final TimeUnit unit)
     {
         synchronized (scheduler) {
-            return scheduler.addAtFixedRate(command, initialDelay, period, unit);
+            return scheduler.add(new FixedRateScheduledFutureTask(scheduler,
+                                                                  command,
+                                                                  clock,
+                                                                  clock.getMillis() + unit.toMillis(initialDelay),
+                                                                  unit.toMillis(period)));
         }
     }
 
     @Override
     public ScheduledFuture<?> scheduleWithFixedDelay(final Runnable command, final long initialDelay, final long delay, final TimeUnit unit)
     {
-        synchronized (scheduler) {
-            return scheduler.addWithFixedDelay(command, initialDelay, delay, unit);
-        }
+        throw new UnsupportedOperationException("Not Yet Implemented!");
     }
 
     @Override
