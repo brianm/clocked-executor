@@ -21,12 +21,31 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>clocked-executor</name>
     <url>http://github.com/brianm/clocked-executor</url>
-
+    <description>
+        ScheduledExecutorService implementation designed for deterministic testing. It runs off an
+        internal clock which must be manually advanced via the
+        `ClockedExecutorService#advance`
+        method.
+    </description>
     <parent>
         <groupId>org.basepom</groupId>
         <artifactId>basepom-standard-oss</artifactId>
         <version>5</version>
     </parent>
+
+    <scm>
+        <connection>scm:git:git://github.com/brianm/clocked-executor.git</connection>
+        <developerConnection>scm:git:git@github.com:brianm/clocked-executor.git</developerConnection>
+        <url>https://github.com/brianm/clocked-executor/</url>
+        <tag>HEAD</tag>
+    </scm>
+    <developers>
+        <developer>
+            <id>brianm</id>
+            <name>Brian McCallister</name>
+            <email>brianm@skife.org</email>
+        </developer>
+    </developers>
 
     <properties>
         <!-- needed for basepom to make surefire happy, this is annoying! -->
