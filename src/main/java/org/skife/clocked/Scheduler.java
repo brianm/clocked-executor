@@ -21,7 +21,7 @@ import java.util.concurrent.ScheduledFuture;
 
 class Scheduler
 {
-    private volatile TreeSet<ScheduledFutureTask<?>> tasks = new TreeSet<>();
+    private TreeSet<ScheduledFutureTask<?>> tasks = new TreeSet<>();
     private final Clock clock;
 
     public Scheduler(final Clock clock)
@@ -29,13 +29,13 @@ class Scheduler
         this.clock = clock;
     }
 
-    public <V> ScheduledFuture<V> add(final ScheduledFutureTask<V> task)
+    public synchronized <V> ScheduledFuture<V> add(final ScheduledFutureTask<V> task)
     {
         tasks.add(task);
         return task;
     }
 
-    public List<ScheduledFutureTask<?>> advance(final long millis)
+    public synchronized List<ScheduledFutureTask<?>> advance(final long millis)
     {
         clock.advanceMillis(millis);
 
