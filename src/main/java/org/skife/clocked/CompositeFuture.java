@@ -46,7 +46,9 @@ class CompositeFuture implements Future<Void>
     public Void get() throws InterruptedException, ExecutionException
     {
         for (Future<?> future : futures) {
-            future.get();
+            if (!future.isCancelled()) {
+                future.get();
+            }
         }
         return null;
     }
