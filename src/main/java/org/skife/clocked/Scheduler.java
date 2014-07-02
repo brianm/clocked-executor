@@ -21,7 +21,7 @@ import java.util.concurrent.ScheduledFuture;
 
 class Scheduler
 {
-    private TreeSet<ScheduledFutureTask<?>> tasks = new TreeSet<>();
+    private TreeSet<ScheduledFutureTask<?>> tasks = new TreeSet<ScheduledFutureTask<?>>();
     private final Clock clock;
 
     public Scheduler(final Clock clock)
@@ -39,10 +39,10 @@ class Scheduler
     {
         clock.advanceMillis(millis);
 
-        TreeSet<ScheduledFutureTask<?>> new_tasks = new TreeSet<>();
+        TreeSet<ScheduledFutureTask<?>> new_tasks = new TreeSet<ScheduledFutureTask<?>>();
         new_tasks.addAll(this.tasks);
 
-        List<ScheduledFutureTask<?>> to_run = new ArrayList<>();
+        List<ScheduledFutureTask<?>> to_run = new ArrayList<ScheduledFutureTask<?>>();
         Iterator<ScheduledFutureTask<?>> itty = new_tasks.iterator();
         while (itty.hasNext()) {
             ScheduledFutureTask<?> t = itty.next();

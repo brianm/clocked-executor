@@ -13,6 +13,7 @@
  */
 package org.skife.clocked;
 
+import java.io.Closeable;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -36,7 +37,7 @@ import java.util.concurrent.TimeUnit;
  * rather violates the normal contracts, but is very useful for testing.
  * </p>
  */
-public class ClockedExecutorService extends ThreadPoolExecutor implements ScheduledExecutorService, AutoCloseable
+public class ClockedExecutorService extends ThreadPoolExecutor implements ScheduledExecutorService, Closeable
 {
     private final Clock clock;
     private final Scheduler scheduler;
@@ -68,9 +69,9 @@ public class ClockedExecutorService extends ThreadPoolExecutor implements Schedu
     public ScheduledFuture<?> schedule(final Runnable command, final long delay, final TimeUnit unit)
     {
         synchronized (scheduler) {
-            return scheduler.add(new ScheduledFutureTask<>(command,
-                                                           clock,
-                                                           clock.getTimeInMillis() + unit.toMillis(delay)));
+            return scheduler.add(new ScheduledFutureTask<Object>(command,
+                                                                 clock,
+                                                                 clock.getTimeInMillis() + unit.toMillis(delay)));
         }
     }
 
@@ -78,9 +79,9 @@ public class ClockedExecutorService extends ThreadPoolExecutor implements Schedu
     public <V> ScheduledFuture<V> schedule(final Callable<V> callable, final long delay, final TimeUnit unit)
     {
         synchronized (scheduler) {
-            return scheduler.add(new ScheduledFutureTask<>(callable,
-                                                           clock,
-                                                           clock.getTimeInMillis() + unit.toMillis(delay)));
+            return scheduler.add(new ScheduledFutureTask<V>(callable,
+                                                            clock,
+                                                            clock.getTimeInMillis() + unit.toMillis(delay)));
         }
     }
 
@@ -112,7 +113,6 @@ public class ClockedExecutorService extends ThreadPoolExecutor implements Schedu
         }
     }
 
-    @Override
     public void close()
     {
         this.shutdownNow();

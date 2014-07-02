@@ -32,8 +32,8 @@ public class ClockedExecutorServiceTest
     @Test
     public void testOneOff() throws Exception
     {
-        try (ClockedExecutorService executor = new ClockedExecutorService())
-        {
+        ClockedExecutorService executor = new ClockedExecutorService();
+        try {
             executor.schedule(COUNTER, 10, TimeUnit.MILLISECONDS);
             executor.schedule(COUNTER, 5, TimeUnit.MILLISECONDS);
             executor.schedule(COUNTER, 15, TimeUnit.MILLISECONDS);
@@ -51,13 +51,16 @@ public class ClockedExecutorServiceTest
             executor.advance(10, TimeUnit.MILLISECONDS).get();
             assertThat(count.get()).isEqualTo(4);
         }
+        finally {
+            executor.close();
+        }
     }
 
     @Test
     public void testAtFixedInterval() throws Exception
     {
-        try (ClockedExecutorService clock = new ClockedExecutorService())
-        {
+        ClockedExecutorService clock = new ClockedExecutorService();
+        try {
             clock.scheduleAtFixedRate(COUNTER, 2, 10, TimeUnit.MILLISECONDS);
             clock.advance(2, TimeUnit.MILLISECONDS).get();
             assertThat(count.get()).isEqualTo(1);
@@ -70,6 +73,9 @@ public class ClockedExecutorServiceTest
 
             clock.advance(10, TimeUnit.MILLISECONDS).get();
             assertThat(count.get()).isEqualTo(3);
+        }
+        finally {
+            clock.close();
         }
     }
 

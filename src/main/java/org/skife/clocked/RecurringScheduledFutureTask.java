@@ -34,11 +34,11 @@ class RecurringScheduledFutureTask<V> extends ScheduledFutureTask<V>
     @Override
     public void run()
     {
-        scheduler.add(new RecurringScheduledFutureTask<>(scheduler,
-                                                         command,
-                                                         getClock(),
-                                                         getWhen() + period,
-                                                         period));
+        scheduler.add(new RecurringScheduledFutureTask<Object>(scheduler,
+                                                               command,
+                                                               getClock(),
+                                                               getWhen() + period,
+                                                               period));
         super.run();
     }
 
